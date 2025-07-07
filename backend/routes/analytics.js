@@ -209,9 +209,21 @@ router.post("/verify-password/:qrCodeId", async (req, res) => {
       }
     );
 
+    // Determine redirect URL based on QR type
+    let redirectUrl = qrCode.text;
+    if (
+      qrCode.qrType === "url" &&
+      (qrCode.text.startsWith("http://") || qrCode.text.startsWith("https://"))
+    ) {
+      redirectUrl = qrCode.text;
+    } else {
+      // For non-URL types, redirect back to the tracking route which will show the landing page
+      redirectUrl = `/track/${qrCodeId}/verified`;
+    }
+
     res.json({
       success: true,
-      redirectUrl: qrCode.text,
+      redirectUrl: redirectUrl,
       message: "Password verified successfully",
       qrCode: {
         text: qrCode.text,

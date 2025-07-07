@@ -119,6 +119,10 @@ router.post("/", authMiddleware, upload.single("logo"), async (req, res) => {
       enableTracking: rawEnableTracking,
     } = req.body;
 
+    // The frontend already formats the text correctly based on QR type
+    // so we can use the text as-is
+    const formattedText = text;
+
     // Convert enableTracking to boolean since it might come as string from FormData
     // Default to true if not provided or if it's undefined
     const enableTracking =
@@ -176,7 +180,7 @@ router.post("/", authMiddleware, upload.single("logo"), async (req, res) => {
 
     // Generate tracking URL if enabled
     let finalTrackingUrl = null;
-    let qrTextForImage = text;
+    let qrTextForImage = formattedText; // Use formatted text instead of raw text
 
     if (enableTracking) {
       const baseUrl =
@@ -211,7 +215,7 @@ router.post("/", authMiddleware, upload.single("logo"), async (req, res) => {
     const qrCode = new QRCodeModel({
       _id: temporaryId,
       userId,
-      text, // Original text/URL
+      text: formattedText, // Store the formatted text that the QR code should contain
       qrType,
       qrImage,
       customization,
